@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice-Activated Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 50px;
+    }
+    .output {
+      font-size: 1.2em;
+      color: #333;
+      margin-top: 20px;
+    }
+    button {
+      font-size: 1.2em;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>Voice-Activated Assistant</h1>
+  <button onclick="startListening()">Start Listening</button>
+  <div class="output" id="output">Click the button and speak a command.</div>
+
+  <script>
+    const output = document.getElementById('output');
+
+    function startListening() {
+      // Check for browser compatibility
+      if (!('webkitSpeechRecognition' in window)) {
+        output.textContent = 'Sorry, your browser does not support the Web Speech API.';
+        return;
+      }
+
+      const recognition = new webkitSpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.continuous = false;
+
+      // Start recognition
+      recognition.start();
+      output.textContent = 'Listening...';
+
+      // Handle results
+      recognition.onresult = (event) => {
+        const command = event.results[0][0].transcript.toLowerCase();
+        output.textContent = `You said: "${command}"`;
+        processCommand(command);
+      };
+
+      recognition.onerror = (event) => {
+        output.textContent = `Error: ${event.error}`;
+      };
+
+      recognition.onend = () => {
+        output.textContent += ' | Listening stopped. Click the button to speak again.';
+      };
+    }
+
+    function processCommand(command) {
+      if (command.includes('open')) {
+        const site = command.split('open ')[1];
+        const url = `https://${site}`;
+        window.open(url, '_blank');
+        output.textContent = `Opening ${site}`;
+      } else if (command.includes('weather')) {
+        output.textContent = 'Checking the weather...';
+        alert('To fetch real-time weather, integrate an API like OpenWeatherMap.');
+      } else if (command.includes('reminder')) {
+        const reminder = command.split('reminder ')[1];
+        output.textContent = `Reminder set: "${reminder}"`;
+      } else if (command.includes('hello')) {
+        output.textContent = 'Hello! How can I assist you today?';
+      } else {
+        output.textContent = 'Command not recognized. Try saying "open [website]", "weather", or "reminder [task]".';
+      }
+    }
+  </script>
+</body>
+</html>
